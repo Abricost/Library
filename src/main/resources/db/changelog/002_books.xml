@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <changeSet id="Create_table_book" author="Anton">
+        <createTable tableName="book">
+            <column name="id" autoIncrement="true" type="bigserial">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="isbn" type="varchar(255)"/>
+            <column name="isbn13" type="varchar(255)"/>
+            <column name="title" type="varchar(255)"/>
+            <column name="original_title" type="varchar(255)"/>
+            <column name="original_publication_year" type="varchar(255)"/>
+            <column name="name" type="varchar"/>
+            <column name="lang_code" type="varchar(255)"/>
+            <column name="image_url" type="varchar(255)"/>
+            <column name="small_image_url" type="varchar(255)"/>
+        </createTable>
+        <createIndex indexName="title_idx" tableName="book">
+            <column name="title"/>
+        </createIndex>
+        <createIndex indexName="isbn_idx" tableName="book">
+            <column name="isbn"/>
+        </createIndex>
+        <createIndex indexName="isbn_title_idx" tableName="book">
+            <column name="title"/>
+            <column name="isbn"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="Create_table_ratings" author="Anton">
+        <createTable tableName="rating">
+            <column name="id" autoIncrement="true" type="bigserial">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="book_id" type="bigint">
+                <constraints foreignKeyName="FK__RATINGS__BOOK_ID" references="book"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints foreignKeyName="FK__RATINGS__USER_ID" references="users"/>
+            </column>
+            <column name="rating" type="smallint"/>
+            <column name="comment" type="varchar(255)"/>
+        </createTable>
+    </changeSet>
+    <!--    <changeSet id="Create_table_book_offer" author="Anton">-->
+    <!--        <createTable tableName="book_offer">-->
+    <!--            <column name="id" autoIncrement="true" type="bigserial">-->
+    <!--                <constraints primaryKey="true"/>-->
+    <!--            </column>-->
+    <!--            <column name="suggested_user_id" type="bigint">-->
+    <!--                <constraints foreignKeyName="FK__SUGGESTED__USER_ID" references="book"/>-->
+    <!--            </column>-->
+    <!--            <column name="book_name" type="varchar"/>-->
+    <!--            <column name="comments" type="varchar"/>-->
+    <!--            <column name="status" type="smallint"/>-->
+    <!--        </createTable>-->
+    <!--    </changeSet>-->
+
+    <changeSet id="load_file_for_books" author="Anton">
+        <loadUpdateData tableName="book" primaryKey="id" encoding="UTF-8" separator="," quotchar="&quot;"
+                        file="db/data/work_book_denormalized.csv">
+            <column header="id" name="id" type="bigint"/>
+            <column header="book_id" type="skip"/>
+            <column header="best_book_id" type="skip"/>
+            <column header="work_id" type="skip"/>
+            <column header="books_count" type="skip"/>
+            <column header="isbn" name="isbn" type="varchar"/>
+            <column header="isbn13" name="isbn13" type="varchar"/>
+            <column header="authors" name="name" type="varchar"/>
+            <column header="original_publication_year" name="original_publication_year" type="varchar"/>
+            <column header="original_title" name="original_title" type="varchar"/>
+            <column header="title" name="title" type="varchar"/>
+            <column header="language_code" name="lang_code" type="varchar"/>
+            <column header="average_rating" type="skip"/>
+            <column header="ratings_count" type="skip"/>
+            <column header="work_ratings_count" type="skip"/>
+            <column header="work_text_reviews_count" type="skip"/>
+            <column header="ratings_1" type="skip"/>
+            <column header="ratings_2" type="skip"/>
+            <column header="ratings_3" type="skip"/>
+            <column header="ratings_4" type="skip"/>
+            <column header="ratings_5" type="skip"/>
+            <column header="image_url" type="varchar"/>
+            <column header="small_image_url" name="small_image_url" type="varchar"/>
+        </loadUpdateData>
+    </changeSet>
+    <changeSet id="load_file_for_ratings" author="Anton">
+        <!--        TODO: Изменить csv файл с rating_min_test.csv на ratings.csv-->
+        <loadUpdateData tableName="rating" primaryKey="id" encoding="UTF-8" separator="," quotchar="&quot;"
+                        onlyUpdate="false"
+                        file="db/data/rating_min_test.csv">
+            <column header="book_id" type="bigint"/>
+            <column header="user_id" name="user_id" type="bigint"/>
+            <column header="rating" name="rating" type="smallint"/>
+        </loadUpdateData>
+    </changeSet>
+    <changeSet id="set_sequence" author="Anton">
+        <sql>
+            SELECT setval('book_id_seq', (SELECT MAX(id) + 1 FROM book))
+        </sql>
+        <sql>
+            SELECT setval('rating_id_seq', (SELECT MAX(id) + 1 FROM rating))
+        </sql>
+        <sql>
+            SELECT setval('users_id_seq', (SELECT MAX(id) + 1 FROM users))
+        </sql>
+    </changeSet>
+</databaseChangeLog>

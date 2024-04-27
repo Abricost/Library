@@ -1,0 +1,16 @@
+version: '2.1'
+
+services:
+
+  postgres:
+    image: postgres:15.0
+    environment:
+      - POSTGRES_DB=Library
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    expose:
+      - 5432
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init_schemas.sql:/docker-entrypoint-initdb.d/init_schemas.sql

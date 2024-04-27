@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <changeSet id="Create_table_users" author="Anton">
+        <createTable tableName="users">
+            <column name="id" autoIncrement="true" type="bigserial">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="username" type="varchar(255)"/>
+            <column name="password" type="varchar(255)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="Create_table_roles" author="Anton">
+        <createTable tableName="role">
+            <column name="id" autoIncrement="true" type="bigserial">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="Create_table_users_roles" author="Anton">
+        <createTable tableName="user_to_role">
+            <column name="id" autoIncrement="true" type="bigserial">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints foreignKeyName="FK__USER_ROLES__USER_ID" references="users"/>
+            </column>
+            <column name="role_id" type="bigint">
+                <constraints foreignKeyName="FK__USER_ROLES__ROLE_ID" references="role"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="load_file_for_users" author="Anton">
+<!--        TODO: Изменить csv файл с rating_min_test.csv на ratings.csv-->
+        <loadUpdateData tableName="users" primaryKey="id" encoding="UTF-8" separator="," quotchar="&quot;" onlyUpdate="false"
+                        file="db/data/rating_min_test.csv">
+            <column header="book_id" type="skip"/>
+            <column header="user_id" name="id" type="bigint"/>
+            <column header="rating" type="skip"/>
+        </loadUpdateData>
+    </changeSet>
+
+    <changeSet id="create_roles" author="Anton">
+        <insert tableName="role">
+            <column name="name" value="ADMIN"/>
+        </insert>
+        <insert tableName="role">
+            <column name="name" value="USER"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="create_user_roles" author="Anton">
+        <insert tableName="user_to_role">
+            <column name="user_id" value="314"/>
+            <column name="role_id" value="2"/>
+        </insert>
+        <insert tableName="user_to_role">
+            <column name="user_id" value="439"/>
+            <column name="role_id" value="1"/>
+        </insert>
+    </changeSet>
+    <changeSet id="update_users" author="Anton">
+        <update tableName="users">
+            <column name="username" value="user1"/>
+            <column name="password" value="$2a$10$IRAa2L42Bz011.za0K6QrevQX2cGHIsbfouKkGdP9OU6S6klTsJn6"/>
+            <where>id = 314</where>
+        </update>
+        <update tableName="users">
+            <column name="username" value="admin"/>
+            <column name="password" value="$2a$10$IRAa2L42Bz011.za0K6QrevQX2cGHIsbfouKkGdP9OU6S6klTsJn6"/>
+            <where>id = 439</where>
+        </update>
+    </changeSet>
+</databaseChangeLog>

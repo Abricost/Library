@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    name: primaryDS
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/Library?currentSchema=public
+    username: postgres
+    password: postgres
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/db.changelog-master.xml
+    drop-first: false
+    default-schema: public
+  jpa:
+    open-in-view: false
+    show-sql: false
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+server:
+  servlet:
+    context-path: /api
